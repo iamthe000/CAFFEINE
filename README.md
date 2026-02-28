@@ -15,7 +15,7 @@
 
 ---
 
-## 📖 概要 (About)
+## 概要
 
 `gotocafe` は、[CAFFEE_Editor](https://github.com/iamthe000/CAFFEE_Editor) の自動化マクロ言語である `.caffeine` ファイルを、外部からシームレスに操作するためのツールです。
 
@@ -28,7 +28,7 @@
 - **Binary Compilation (バイナリ化モード)**: マクロコードをGoのバイナリに埋め込み、独立した実行可能ファイルを生成します。
 - **TUI Automation**: バックエンドで `expect` を用いることで、複雑なターミナルUIのキーボード入力を完全にエミュレートします。
 
-## 必須環境
+## 必須環境 (Prerequisites)
 
 本ツールをビルド・実行するには以下の環境が必要です。
 
@@ -38,7 +38,7 @@
   - Ubuntu/Debian: `sudo apt install expect`
   - macOS (Homebrew): `brew install expect`
 
-## インストール
+## インストール (Installation)
 
 ソースコードをダウンロードし、ビルドしてパスの通ったディレクトリに配置します。
 
@@ -52,3 +52,62 @@ go build -o gotocafe gotocafe.go
 
 # 3. 実行可能ファイルをPATHの通った場所に移動（例: /usr/local/bin/）
 sudo mv gotocafe /usr/local/bin/
+
+```
+
+## 使い方
+
+`gotocafe` には大きく分けて2つのモードがあります。
+
+### 1. マクロをそのまま実行する (Direct Run Mode)
+
+作成した `sample.caffeine` を、コマンドラインから即座にCAFFEEエディタ上で実行します。
+
+```bash
+gotocafe sample.caffeine
+
+```
+
+> **動作**: `caffee` が起動し、自動的に `Ctrl+P` -> `:macro sample.caffeine` が入力されて実行されます。
+
+### 2. マクロをバイナリ化する (Compile Mode)
+
+マクロを他の環境でも単体で動かせるように（※実行環境にCAFFEEとexpectは必要です）、専用のコマンドツールとしてコンパイルします。`cafename=` 引数に出力ファイル名を指定してください。
+
+```bash
+# sample.caffeine を 'my_macro_tool' というバイナリに変換
+gotocafe sample.caffeine cafename=my_macro_tool
+
+# 生成されたツールを実行
+./my_macro_tool
+
+```
+
+> **動作**: `sample.caffeine` の中身がGoコード内に文字列として埋め込まれ、`go build` が実行されます。生成されたバイナリは、実行時に一時ファイルとしてマクロを展開し、自動的にCAFFEEを立ち上げて処理を実行します。
+
+## アーキテクチャ (How it works)
+
+`gotocafe` は以下の仕組みで動作しています。
+
+1. **疑似端末エミュレーション**: Goの `os/exec` から `expect` スクリプトを呼び出し、ターミナルエミュレータ上のプロセスとして `caffee` を `spawn` します。
+2. **キー入力のインジェクト**: 起動直後のウェイト（約0.5秒）を挟んだ後、コマンドモードに入るための制御文字 `\x10` (Ctrl+P) を送信し、マクロ実行コマンドを流し込みます。
+3. **制御の移譲**: マクロ実行開始後、`interact` コマンドによってプロセスの制御をユーザーに返し、ユーザーがそのままエディタの操作を継続できるようにしています。
+
+## 🤝 コントリビューション
+
+Issueの報告やPull Requestは大歓迎です。
+バグ報告や新機能の提案は、GitHubのIssueトラッカーからお願いいたします。
+
+## 📄 ライセンス
+
+This project is licensed under the MIT License
+
+```
+
+---
+
+### おすすめのカスタマイズポイント
+* リポジトリ名やユーザー名のURL（`https://github.com/yourusername/...`）をご自身の環境に合わせて書き換えてください。
+* 必要であれば、CAFFEINEマクロの簡単なサンプルコード（前回の `sample.caffeine` など）を `使い方` の項目に追記すると、初めてツールを見る人にとってさらに親切になります。
+
+```
