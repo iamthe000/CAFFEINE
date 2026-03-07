@@ -2,6 +2,8 @@
 
 # ☕ gotocafe
 
+<img src="無題946_20260307191231.png" width="600px">
+
 **CAFFEINE Macro Runner & Compiler for CAFFEE_Editor**
 
 [![Go Version](https://img.shields.io/badge/Go-1.16+-00ADD8?logo=go&logoColor=white)](https://golang.org/)
